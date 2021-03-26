@@ -6,7 +6,6 @@ use App\Mail\Email;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -39,7 +38,7 @@ class OrderController extends Controller
         Mail::to(config('mail.manager_email'))
             ->send(new Email($order, $orderProducts));
 
-        $request->session()->forget('cartProducts');
+        session()->forget('cartProducts');
 
         return redirect(route('product.index'));
     }

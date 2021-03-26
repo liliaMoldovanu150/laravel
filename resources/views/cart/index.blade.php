@@ -13,7 +13,7 @@
                         <div>{{ $cartProduct->description }}</div>
                         <div>{{ number_format($cartProduct->price, 2) }}</div>
                     </div>
-                    <form action="{{ route('cart.delete', $cartProduct->id) }}" method="post">
+                    <form action="{{ route('cart.delete', $cartProduct->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <input type="submit" value="{{ __('labels.remove') }}">
@@ -22,7 +22,7 @@
                 <br>
             @endforeach
             <div class="total-price">{{ __('labels.total_price') }}: {{ number_format($totalPrice, 2) }}</div>
-            <form class="cart-form" action="{{ route('order.store') }}" method="post">
+            <form class="cart-form" action="{{ route('order.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="totalPrice" value="{{ $totalPrice }}">
                 <input

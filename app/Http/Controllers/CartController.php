@@ -17,22 +17,22 @@ class CartController extends Controller
         return view('cart.index', compact('cartProducts', 'totalPrice'));
     }
 
-    public function store(Product $product, Request $request)
+    public function store(Product $product)
     {
         if (Product::find($product->id)) {
-            if ($request->session()->exists('cartProducts')) {
-                $request->session()->push('cartProducts', $product->id);
+            if (session()->exists('cartProducts')) {
+                session()->push('cartProducts', $product->id);
             } else {
-                $request->session()->put('cartProducts', [$product->id]);
+                session()->put('cartProducts', [$product->id]);
             }
         }
-        return redirect(route('product.index'));
+        return redirect()->back();
     }
 
     public function delete(Product $product, Request $request)
     {
         $key = array_search($product->id, session('cartProducts'));
-        $cartProducts = $request->session()->pull('cartProducts', []);
+        $cartProducts = session()->pull('cartProducts', []);
         unset($cartProducts[$key]);
         session()->put('cartProducts', $cartProducts);
         return redirect()->back();
