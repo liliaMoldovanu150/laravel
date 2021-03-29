@@ -21,11 +21,13 @@ Route::middleware(['admin'])->group(function () {
         ->name('product.update');
     Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])
         ->name('product.destroy');
+    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])
+        ->name('order.index');
     });
 
 Route::post('/cart/{product}', [App\Http\Controllers\CartController::class, 'store'])->name('cart.store');
 Route::delete('/cart/{product}', [App\Http\Controllers\CartController::class, 'delete'])->name('cart.delete');
-Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+Route::get('/cart', [App\Http\Controllers\CartController::class, 'show'])->name('cart.show');
 
 Route::post('/order', [App\Http\Controllers\OrderController::class, 'store'])->name('order.store');
 

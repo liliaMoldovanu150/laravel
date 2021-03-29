@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function index()
+    public function show()
     {
         $cartProducts = Product::whereIn('id', session('cartProducts') ?? [])->get();
         $totalPrice = 0;
         foreach ($cartProducts as $cartProduct) {
             $totalPrice += $cartProduct->price;
         }
-        return view('cart.index', compact('cartProducts', 'totalPrice'));
+        return view('cart.show', compact('cartProducts', 'totalPrice'));
     }
 
     public function store(Product $product)
@@ -29,7 +28,7 @@ class CartController extends Controller
         return redirect()->back();
     }
 
-    public function delete(Product $product, Request $request)
+    public function delete(Product $product)
     {
         $key = array_search($product->id, session('cartProducts'));
         $cartProducts = session()->pull('cartProducts', []);
