@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Mail\Email;
 use App\Models\Order;
-use App\Models\OrderProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -32,14 +31,19 @@ class OrderController extends Controller
             $newOrder->products()->attach([$cartProduct => ['product_price' => Product::find($cartProduct)->price]]);
         }
 
-        $order = Order::latest()->first();
-        $orderProducts = $order->products->toArray();
+        $orderProducts = $newOrder->products->toArray();
 
         Mail::to(config('mail.manager_email'))
-            ->send(new Email($order, $orderProducts));
+            ->send(new Email($newOrder, $orderProducts));
 
         session()->forget('cartProducts');
 
         return redirect(route('product.index'));
+    }
+
+    public function index()
+    {
+        $orders = Order::with('products')->get();
+        return view('orders.index', compact('orders'));
     }
 }
