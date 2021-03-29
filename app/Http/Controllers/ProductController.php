@@ -84,4 +84,12 @@ class ProductController extends Controller
 
         return redirect(route('product.display'));
     }
+
+    public function destroy(Product $product)
+    {
+        File::delete('./images/' .$product->image_url);
+        Product::destroy($product->id);
+
+        return redirect()->back();
+    }
 }
