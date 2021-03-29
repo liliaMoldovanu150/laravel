@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="content-wrapper">
+        <h1 class="heading">{{ __('labels.products') }}</h1>
         @if ($products->count())
             @foreach ($products as $product)
                 <div class="product-item">
@@ -13,20 +14,24 @@
                         <div>{{ $product->description }}</div>
                         <div>{{ number_format($product->price, 2) }}</div>
                     </div>
-                    <a href="{{ route('product.edit', $product->id) }}">{{ __('labels.edit') }}</a>
-                    <form action="{{ route('product.destroy', $product->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <input type="submit" value="{{ __('labels.delete') }}">
-                    </form>
+                    <div class="actions">
+                        <a href="{{ route('product.edit', $product->id) }}">{{ __('labels.edit') }}</a>
+                        <form action="{{ route('product.destroy', $product->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <input class="link" type="submit" value="{{ __('labels.delete') }}">
+                        </form>
+                    </div>
                 </div>
                 <br>
             @endforeach
         @endif
-        <a href="{{ route('product.create') }}">{{ __('labels.add') }}</a>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <input type="submit" value="{{ __('labels.logout') }}">
-        </form>
+        <div class="actions">
+            <a style="display: block" href="{{ route('product.create') }}">{{ __('labels.add') }}</a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <input class="link" type="submit" value="{{ __('labels.logout') }}">
+            </form>
+        </div>
     </div>
 @endsection

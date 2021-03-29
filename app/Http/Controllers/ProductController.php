@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -25,6 +26,17 @@ class ProductController extends Controller
         return view('products.create');
     }
 
+    private function uploadImage(Request $request)
+    {
+        $file = $request->file('image');
+        $extension = $file->getClientOriginalExtension();
+        $fileName = time() . '.' . $extension;
+        $path = public_path() . '/images';
+        $file->move($path, $fileName);
+
+        return $fileName;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -34,14 +46,8 @@ class ProductController extends Controller
             'image' => 'required|mimes:jpg,jpeg,png,gif|max:100000'
         ]);
 
-        $file = $request->file('image');
-        $extension = $file->getClientOriginalExtension();
-        $fileName = time() . '.' . $extension;
-        $path = public_path() . '/images';
-        $file->move($path, $fileName);
-
         $newProduct = Product::create($request->all());
-        $newProduct->image_url = $fileName;
+        $newProduct->image_url = $this->uploadImage($request);
         $newProduct->save();
 
         return redirect(route('product.display'));
@@ -69,26 +75,13 @@ class ProductController extends Controller
             ]);
 
         if ($request->file('image')) {
-            $file = $request->file('image');
-            $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '.' . $extension;
-            $path = public_path() . '/images';
-            $file->move($path, $fileName);
-
             Product::where('id', $product->id)
                 ->update([
-                    'image_url' => $fileName
+                    'image_url' => $this->uploadImage($request)
                 ]);
 
         }
 
         return redirect(route('product.display'));
-    }
-
-    public function destroy(Product $product)
-    {
-        Product::destroy($product->id);
-
-        return redirect()->back();
     }
 }
