@@ -13,7 +13,7 @@
                         <div>{{ $cartProduct->description }}</div>
                         <div>{{ number_format($cartProduct->price, 2) }}</div>
                     </div>
-                    <form action="{{ route('cart.delete', $cartProduct->id) }}" method="POST">
+                    <form action="{{ route('cart.destroy', $cartProduct->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <input type="submit" value="{{ __('labels.remove') }}">

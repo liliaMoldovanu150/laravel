@@ -28,7 +28,7 @@ class CartController extends Controller
         return redirect()->back();
     }
 
-    public function delete(Product $product)
+    public function destroy(Product $product)
     {
         $key = array_search($product->id, session('cartProducts'));
         $cartProducts = session()->pull('cartProducts', []);
