@@ -2,7 +2,6 @@
 
 @section('content')
 
-
     <div class="orders-wrapper">
         <h1 class="heading">{{ __('labels.orders') }}</h1>
         @foreach ($orders as $order)
