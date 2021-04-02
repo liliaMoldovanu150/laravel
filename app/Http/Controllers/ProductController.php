@@ -8,11 +8,19 @@ use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $cartProducts = session('cartProducts');
         $products = Product::whereNotIn('id', $cartProducts ?? [])->get();
-        return view('products.index', compact('products'));
+
+        if ($request->ajax()) {
+            return response()->json($products);
+        }
+        else {
+            return view('products.index', compact('products'));
+        }
+
+//        return view('app');
     }
 
     public function display()

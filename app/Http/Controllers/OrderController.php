@@ -38,7 +38,11 @@ class OrderController extends Controller
 
         session()->forget('cartProducts');
 
-        return redirect(route('product.index'));
+        if ($request->ajax()) {
+            return response()->json(['statusCode' => 200]);
+        } else {
+            return redirect(route('product.index'));
+        }
     }
 
     public function index()

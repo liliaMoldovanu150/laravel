@@ -3,20 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
         $cartProducts = Product::whereIn('id', session('cartProducts') ?? [])->get();
         $totalPrice = 0;
         foreach ($cartProducts as $cartProduct) {
             $totalPrice += $cartProduct->price;
         }
-        return view('cart.show', compact('cartProducts', 'totalPrice'));
+
+        if ($request->ajax()) {
+            return response()->json([
+                'cartProducts' => $cartProducts,
+                'totalPrice' => $totalPrice
+            ]);
+        } else {
+            return view('cart.show', compact('cartProducts', 'totalPrice'));
+        }
     }
 
-    public function store(Product $product)
+    public function store(Product $product, Request $request)
     {
         if (Product::find($product->id)) {
             if (session()->exists('cartProducts')) {
@@ -25,15 +34,25 @@ class CartController extends Controller
                 session()->put('cartProducts', [$product->id]);
             }
         }
-        return redirect()->back();
+
+        if ($request->ajax()) {
+            return response()->json('product stored');
+        } else {
+            return redirect()->back();
+        }
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product, Request $request)
     {
         $key = array_search($product->id, session('cartProducts'));
         $cartProducts = session()->pull('cartProducts', []);
         unset($cartProducts[$key]);
         session()->put('cartProducts', $cartProducts);
-        return redirect()->back();
+
+        if ($request->ajax()) {
+            return response()->json('product deleted');
+        } else {
+            return redirect()->back();
+        }
     }
 }
