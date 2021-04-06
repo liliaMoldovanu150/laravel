@@ -10,7 +10,8 @@
             'cartStore': '{{ route('cart.store', ':id') }}',
             'cartDestroy': '{{ route('cart.destroy', ':id') }}',
             'cartShow': '{{ route('cart.show') }}',
-            'orderStore': '{{ route('order.store') }}'
+            'orderStore': '{{ route('order.store') }}',
+            'login': '{{ route('login') }}'
         }
 
         $(document).ready(function () {
@@ -133,6 +134,31 @@
                             });
                         });
                         break;
+                    case '#login':
+                        $('.login').html(trans($('.login').html())).show();
+
+                        $('#loginForm').on('submit', function (e) {
+                            $('form span').hide();
+                            e.preventDefault();
+                            $.ajax(config.login, {
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    email: $('#email').val(),
+                                    password: $('#password').val(),
+                                },
+                                success: function () {
+                                    window.location.hash = '#';
+                                },
+                                error: function (response) {
+                                    let errors = response.responseJSON.errors;
+                                    for (let error in errors) {
+                                        $('span.' + error).text(errors[error]).show();
+                                    }
+                                }
+                            });
+                        });
+                        break;
                     default:
                         $('.index').html(trans($('.index').html())).show();
 
@@ -162,14 +188,13 @@
     </script>
 </head>
 <body>
-<!-- The index page -->
+
 <div class="page index">
     <table class="list" style="border: 1px solid black"></table>
 
     <a href="#cart" class="button">[[labels.go_to_cart]]</a>
 </div>
 
-<!-- The cart page -->
 <div class="page cart">
     <table class="list" style="border: 1px solid black"></table>
 
@@ -201,6 +226,30 @@
     </form>
 
     <a href="#" class="button">[[labels.go_to_index]]</a>
+</div>
+
+<div class="page login">
+    <form id="loginForm">
+        <input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="[[labels.email]]"
+        >
+        <br>
+        <span class="error email" style="display: none"></span>
+        <br>
+        <input
+            id="password"
+            type="password"
+            name="password"
+            placeholder="[[labels.password]]"
+        >
+        <br>
+        <span class="error password" style="display: none"></span>
+        <br>
+        <input type="submit" value="[[labels.login]]">
+    </form>
 </div>
 </body>
 </html>
