@@ -1,14 +1,22 @@
 <html>
 <head>
-    <!-- Load the jQuery JS library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <!-- Custom JS script -->
     <script type="text/javascript">
+        const config = {
+            'csrfToken': '{{ csrf_token() }}',
+            'translations': {!! Cache::get('translations') !!},
+            'productIndex': '{{ route('product.index') }}',
+            'cartStore': '{{ route('cart.store', ':id') }}',
+            'cartDestroy': '{{ route('cart.destroy', ':id') }}',
+            'cartShow': '{{ route('cart.show') }}',
+            'orderStore': '{{ route('order.store') }}'
+        }
+
         $(document).ready(function () {
             $.ajaxSetup({
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': config.csrfToken,
                 }
             });
 
@@ -16,7 +24,7 @@
                 let labels = html.match(/(?<=\[\[)\w+.\w+(?=\]\])/g);
 
                 for (let label in labels) {
-                    let translation = labels[label].split('.').reduce((t, i) => t[i] || null, window.translations);
+                    let translation = labels[label].split('.').reduce((t, i) => t[i] || null, config.translations);
                     html = html.replace(`[[${labels[label]}]]`, translation);
                 }
 
@@ -74,21 +82,20 @@
                     case '#cart':
                         $('.cart').html(trans($('.cart').html())).show();
 
-                        $.ajax('{{ route('cart.show') }}', {
+                        $.ajax(config.cartShow, {
                             dataType: 'json',
                             success: function (response) {
-                                $('.cart .list, #checkout').show();
+                                $('.cart .list, #checkoutForm').show();
                                 $('#emptyCart').hide();
                                 if (!response['cartProducts'].length) {
-                                    $('.cart .list, #checkout').hide();
+                                    $('.cart .list, #checkoutForm').hide();
                                     $('#emptyCart').show();
                                 }
                                 $('.cart .list').html(trans(renderList(response['cartProducts'], response['totalPrice'])));
 
                                 $('.actionBtn').on('click', function (e) {
                                     const id = $(this).val();
-                                    let url = '{{ route('cart.destroy', ':id') }}';
-                                    url = url.replace(':id', id);
+                                    let url = config.cartDestroy.replace(':id', id);
                                     $.ajax({
                                         url: url,
                                         type: 'DELETE',
@@ -101,9 +108,9 @@
                             }
                         });
 
-                        $('#checkout').on('submit', function (e) {
+                        $('#checkoutForm').on('submit', function (e) {
                             e.preventDefault();
-                            $.ajax('{{ route('order.store') }}', {
+                            $.ajax(config.orderStore, {
                                 type: 'POST',
                                 data: {
                                     name: $('#name').val(),
@@ -113,7 +120,7 @@
                                 },
                                 success: function (response) {
                                     if (response['statusCode'] === 200) {
-                                        window.location.hash = '/';
+                                        window.location.hash = '#';
                                     }
                                 },
                                 error: function (response) {
@@ -129,15 +136,14 @@
                     default:
                         $('.index').html(trans($('.index').html())).show();
 
-                        $.ajax('{{ route('product.index') }}', {
+                        $.ajax(config.productIndex, {
                             dataType: 'json',
                             success: function (response) {
                                 $('.index .list').html(trans(renderList(response)));
 
                                 $('.actionBtn').on('click', function (e) {
                                     const id = $(this).val();
-                                    let url = '{{ route('cart.store', ':id') }}';
-                                    url = url.replace(':id', id);
+                                    let url = config.cartStore.replace(':id', id);
                                     $.ajax({
                                         url: url,
                                         type: 'POST',
@@ -168,7 +174,7 @@
     <table class="list" style="border: 1px solid black"></table>
 
     <p id="emptyCart" style="display: none">[[labels.empty_cart]]</p>
-    <form id="checkout" class="cart-form">
+    <form id="checkoutForm" class="cart-form">
         <input
             id="name"
             type="text"
@@ -196,8 +202,5 @@
 
     <a href="#" class="button">[[labels.go_to_index]]</a>
 </div>
-<script>
-    window.translations = {!! Cache::get('translations') !!};
-</script>
 </body>
 </html>

@@ -33,5 +33,6 @@ return [
     'date' => 'Date',
      'cart' => 'Your cart',
     'from' => 'from',
-    'enjoy' => 'Enjoy your shopping!'
+    'enjoy' => 'Enjoy your shopping!',
+    'email' => 'Email',
 ];

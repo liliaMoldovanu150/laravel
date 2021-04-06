@@ -19,8 +19,6 @@ class ProductController extends Controller
         else {
             return view('products.index', compact('products'));
         }
-
-//        return view('app');
     }
 
     public function display()
@@ -101,3 +99,5 @@ class ProductController extends Controller
         return redirect()->back();
     }
 }
+
+
