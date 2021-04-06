@@ -21,6 +21,8 @@ Route::middleware(['admin'])->group(function () {
         ->name('product.update');
     Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])
         ->name('product.destroy');
+    Route::get('/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])
+        ->name('order.show');
     Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])
         ->name('order.index');
     });

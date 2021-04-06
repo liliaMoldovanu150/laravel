@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
+    public function index()
+    {
+        $orders = Order::with('products')->get();
+        return view('orders.index', compact('orders'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -41,9 +47,9 @@ class OrderController extends Controller
         return redirect(route('product.index'));
     }
 
-    public function index()
+    public function show(Order $order)
     {
-        $orders = Order::with('products')->get();
-        return view('orders.index', compact('orders'));
+        $order = Order::with('products')->find($order->id);
+        return view('orders.show', compact('order'));
     }
 }
