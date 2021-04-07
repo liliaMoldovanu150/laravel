@@ -20,6 +20,13 @@ class IsAdmin
         if (Auth::user() &&  Auth::user()->is_admin == 1) {
             return $next($request);
         }
-        return redirect(route('product.index'));
+
+        if (!Auth::check()) {
+            if ($request->ajax()) {
+                return response()->json([], 401);
+            } else {
+                return redirect(route('product.index'));
+            }
+        }
     }
 }

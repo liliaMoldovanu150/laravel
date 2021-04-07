@@ -36,7 +36,7 @@ class CartController extends Controller
         }
 
         if ($request->ajax()) {
-            return response()->json('product stored');
+            return response()->json(['success' => true], 200);
         } else {
             return redirect()->back();
         }
@@ -50,7 +50,7 @@ class CartController extends Controller
         session()->put('cartProducts', $cartProducts);
 
         if ($request->ajax()) {
-            return response()->json('product deleted');
+            return response()->json(['success' => true], 200);
         } else {
             return redirect()->back();
         }

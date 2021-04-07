@@ -39,7 +39,7 @@ class OrderController extends Controller
         session()->forget('cartProducts');
 
         if ($request->ajax()) {
-            return response()->json(['statusCode' => 200]);
+            return response()->json(['success' => true], 200);
         } else {
             return redirect(route('product.index'));
         }

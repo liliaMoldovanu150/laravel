@@ -15,21 +15,29 @@ class ProductController extends Controller
 
         if ($request->ajax()) {
             return response()->json($products);
-        }
-        else {
+        } else {
             return view('products.index', compact('products'));
         }
     }
 
-    public function display()
+    public function display(Request $request)
     {
         $products = Product::all();
-        return view('products.display', compact('products'));
+
+        if ($request->ajax()) {
+            return response()->json($products);
+        } else {
+            return view('products.display', compact('products'));
+        }
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('products.create');
+        if ($request->ajax()) {
+            return response()->json(['success' => true], 200);
+        } else {
+            return view('products.create');
+        }
     }
 
     private function uploadImage(Request $request)
@@ -59,9 +67,13 @@ class ProductController extends Controller
         return redirect(route('product.display'));
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product, Request $request)
     {
-        return view('products.edit', compact('product'));
+        if ($request->ajax()) {
+            return response()->json($product);
+        } else {
+            return view('products.edit', compact('product'));
+        }
     }
 
     public function update(Request $request, Product $product)
@@ -91,12 +103,16 @@ class ProductController extends Controller
         return redirect(route('product.display'));
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product, Request $request)
     {
         File::delete('./images/' .$product->image_url);
         Product::destroy($product->id);
 
-        return redirect()->back();
+        if ($request->ajax()) {
+            return response()->json(['success' => true], 200);
+        } else {
+            return redirect()->back();
+        }
     }
 }
 

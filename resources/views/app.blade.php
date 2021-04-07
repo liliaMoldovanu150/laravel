@@ -11,7 +11,15 @@
             'cartDestroy': '{{ route('cart.destroy', ':id') }}',
             'cartShow': '{{ route('cart.show') }}',
             'orderStore': '{{ route('order.store') }}',
-            'login': '{{ route('login') }}'
+            'login': '{{ route('login') }}',
+            'productDestroy': '{{ route('product.destroy', ':id') }}',
+            'productStore': '{{ route('product.store') }}',
+            'productDisplay': '{{ route('product.display') }}',
+            'productCreate': '{{ route('product.create') }}',
+            'productEdit': '{{ route('product.edit', ':id') }}',
+            'productUpdate': '{{ route('product.update', ':id') }}',
+            'orderIndex': '{{ route('order.index') }}',
+            'logout': '{{ route('logout') }}'
         }
 
         $(document).ready(function () {
@@ -32,21 +40,10 @@
                 return html;
             }
 
-            function get_total_price() {
-                let sum = 0;
-                if ($('.cart .price').length > 0) {
-                    $('.cart .price').each(function () {
-                        sum += parseFloat($(this).text());
-                    });
-                    $('#totalPrice span').text(sum);
-                } else {
-                    $('#totalPrice').remove();
-                }
-            }
-
-            function renderList(products, totalPrice = null) {
+            function renderList(products, totalPrice = null, adminMode = null) {
                 html = [
                     '<tr>',
+                    '<th>[[labels.product_image]]</th>',
                     '<th>[[labels.title]]</th>',
                     '<th>[[labels.description]]</th>',
                     '<th>[[labels.price]]</th>',
@@ -54,21 +51,39 @@
                 ].join('');
 
                 $.each(products, function (key, product) {
-                    let btnLabel = totalPrice ? '[[labels.remove]]' : '[[labels.add]]';
-                    html += [
-                        '<tr>',
-                        '<td>' + product.title + '</td>',
-                        '<td>' + product.description + '</td>',
-                        '<td class="price">' + product.price + '</td>',
-                        '<td><button class="actionBtn" value="' + product.id + '">' + btnLabel + '</button></td>',
-                        '</tr>'
-                    ].join('');
+                    if (!adminMode) {
+                        let btnLabel = totalPrice ? '[[labels.remove]]' : '[[labels.add]]';
+                        html += [
+                            '<tr>',
+                            '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
+                            + product.image_url
+                            + '" alt="[[labels.product_image]]"></td>',
+                            '<td>' + product.title + '</td>',
+                            '<td>' + product.description + '</td>',
+                            '<td class="price">' + product.price + '</td>',
+                            '<td><button class="actionBtn" value="' + product.id + '">' + btnLabel + '</button></td>',
+                            '</tr>'
+                        ].join('');
+                    } else {
+                        html += [
+                            '<tr>',
+                            '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
+                            + product.image_url
+                            + '" alt="[[labels.product_image]]"></td>',
+                            '<td>' + product.title + '</td>',
+                            '<td>' + product.description + '</td>',
+                            '<td class="price">' + product.price + '</td>',
+                            '<td><a href class="editProduct" data-id="' + product.id + '">[[labels.edit]]</a></td>',
+                            '<td><a href class="deleteProduct" data-id="' + product.id + '">[[labels.delete]]</a></td>',
+                            '</tr>'
+                        ].join('');
+                    }
                 });
 
-                if (totalPrice) {
+                if (!adminMode && totalPrice) {
                     html += [
                         '<tr>',
-                        '<td id="totalPrice">[[labels.total_price]]: <span>' + totalPrice + '</span></td>',
+                        '<td id="totalPrice" colspan="2">[[labels.total_price]]: <span>' + totalPrice + '</span></td>',
                         '</tr>'
                     ].join('');
                 }
@@ -86,23 +101,23 @@
                         $.ajax(config.cartShow, {
                             dataType: 'json',
                             success: function (response) {
-                                $('.cart .list, #checkoutForm').show();
-                                $('#emptyCart').hide();
                                 if (!response['cartProducts'].length) {
                                     $('.cart .list, #checkoutForm').hide();
                                     $('#emptyCart').show();
+                                } else {
+                                    $('.cart .list, #checkoutForm').show();
+                                    $('#emptyCart').hide();
                                 }
                                 $('.cart .list').html(trans(renderList(response['cartProducts'], response['totalPrice'])));
 
-                                $('.actionBtn').on('click', function (e) {
+                                $('.cart .list').on('click', '.actionBtn', function (e) {
                                     const id = $(this).val();
                                     let url = config.cartDestroy.replace(':id', id);
-                                    $.ajax({
-                                        url: url,
+                                    $.ajax(url, {
                                         type: 'DELETE',
+                                        dataType: 'json',
                                         success: function () {
-                                            $(e.target).parent().parent().remove();
-                                            get_total_price();
+                                            location.reload();
                                         }
                                     });
                                 });
@@ -110,22 +125,21 @@
                         });
 
                         $('#checkoutForm').on('submit', function (e) {
+                            $('form span').hide();
                             e.preventDefault();
                             $.ajax(config.orderStore, {
                                 type: 'POST',
+                                dataType: 'json',
                                 data: {
                                     name: $('#name').val(),
                                     details: $('#details').val(),
                                     comments: $('#comments').val(),
                                     totalPrice: $('#totalPrice span').text(),
                                 },
-                                success: function (response) {
-                                    if (response['statusCode'] === 200) {
-                                        window.location.hash = '#';
-                                    }
+                                success: function () {
+                                    window.location.hash = '#';
                                 },
                                 error: function (response) {
-                                    $('form span').hide();
                                     let errors = response.responseJSON.errors;
                                     for (let error in errors) {
                                         $('span.' + error).text(errors[error]).show();
@@ -159,25 +173,95 @@
                             });
                         });
                         break;
+                    case '#products':
+                        $.ajax(config.productDisplay, {
+                            dataType: 'json',
+                            success: function (response) {
+                                $('.products').html(trans($('.products').html())).show();
+                                $('.products .list').html(trans(renderList(response, null, 'adminMode')));
+
+                                $('.products .list').on('click', 'a', function (e) {
+                                    e.preventDefault();
+                                    const id = $(this).attr('data-id');
+                                    let url;
+                                    if ($(e.target).attr('class') === 'editProduct') {
+                                        url = config.productEdit.replace(':id', id);
+                                        $.ajax(url, {
+                                            dataType: 'json',
+                                            success: function (response) {
+                                                $('.products').hide();
+                                                $('.product').html(trans($('.product').html())).show();
+                                                $('#title').val(response.title);
+                                                $('#description').val(response.description);
+                                                $('#price').val(response.price);
+                                            },
+                                            error: function () {
+                                                window.location.hash = '#';
+                                            }
+                                        });
+                                    } else {
+                                        url = config.productDestroy.replace(':id', id);
+                                        $.ajax(url, {
+                                            type: 'DELETE',
+                                            dataType: 'json',
+                                            success: function () {
+                                                location.reload();
+                                            }
+                                        });
+                                    }
+                                });
+
+                                $('#logout').on('click', function (e) {
+                                    e.preventDefault();
+                                    $.ajax(config.logout, {
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        success: function () {
+                                            window.location.hash = '#';
+                                        },
+                                    });
+                                })
+                            },
+                            error: function () {
+                                window.location.hash = '#';
+                            }
+                        });
+                        break;
+                    case '#products/create':
+                        $.ajax(config.productCreate, {
+                            dataType: 'json',
+                            success: function () {
+                                $('.product').html(trans($('.product').html())).show();
+                            },
+                            error: function () {
+                                window.location.hash = '#';
+                            }
+                        });
+                        break;
                     default:
                         $('.index').html(trans($('.index').html())).show();
 
                         $.ajax(config.productIndex, {
                             dataType: 'json',
                             success: function (response) {
-                                $('.index .list').html(trans(renderList(response)));
+                                if (!response.length) {
+                                    $('.index .list').hide();
+                                    $('#allAdded').show();
+                                } else {
+                                    $('.index .list').html(trans(renderList(response)));
+                                }
 
-                                $('.actionBtn').on('click', function (e) {
+                                $('.index .list').on('click', '.actionBtn', function (e) {
                                     const id = $(this).val();
                                     let url = config.cartStore.replace(':id', id);
-                                    $.ajax({
-                                        url: url,
+                                    $.ajax(url, {
                                         type: 'POST',
+                                        dataType: 'json',
                                         success: function () {
-                                            $(e.target).parent().parent().remove();
+                                            location.reload();
                                         }
                                     });
-                                });
+                                })
                             }
                         });
                         break;
@@ -192,6 +276,8 @@
 <div class="page index">
     <table class="list" style="border: 1px solid black"></table>
 
+    <p id="allAdded" style="display: none">[[labels.all_added]]</p>
+
     <a href="#cart" class="button">[[labels.go_to_cart]]</a>
 </div>
 
@@ -199,7 +285,7 @@
     <table class="list" style="border: 1px solid black"></table>
 
     <p id="emptyCart" style="display: none">[[labels.empty_cart]]</p>
-    <form id="checkoutForm" class="cart-form">
+    <form id="checkoutForm">
         <input
             id="name"
             type="text"
@@ -251,5 +337,55 @@
         <input type="submit" value="[[labels.login]]">
     </form>
 </div>
+
+<div class="page products">
+    <table class="list" style="border: 1px solid black"></table>
+
+    <a id="addProduct" href="#products/create">[[labels.add]]</a>
+    <a id="logout" href>[[labels.logout]]</a>
+</div>
+
+<div class="page product">
+    <form id="productForm" enctype="multipart/form-data">
+        <input
+            id="title"
+            type="text"
+            name="title"
+            placeholder="[[labels.title]]"
+        >
+        <span class="error"></span>
+        <br><br>
+        <textarea
+            id="description"
+            rows="5"
+            cols="20"
+            type="text"
+            name="description"
+            placeholder="[[labels.description]]"
+        ></textarea>
+        <span class="error"></span>
+        <br><br>
+        <input
+            id="price"
+            type="number"
+            name="price"
+            min="0.00"
+            step="0.01"
+            placeholder="[[labels.price]]"
+        >
+        <span class="error"></span>
+        <br><br>
+        <input
+            id="image"
+            type="file"
+            name="image"
+        >
+        <span class="error"></span>
+        <br><br>
+        <input type="submit" value="[[labels.save]]">
+    </form>
+    <a href="#products">[[labels.products]]</a>
+</div>
+
 </body>
 </html>
