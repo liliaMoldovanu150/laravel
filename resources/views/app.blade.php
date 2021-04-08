@@ -41,7 +41,7 @@
             }
 
             function renderList(products, totalPrice = null, adminMode = null) {
-                html = [
+                let html = [
                     '<tr>',
                     '<th>[[labels.product_image]]</th>',
                     '<th>[[labels.title]]</th>',
@@ -52,47 +52,68 @@
 
                 $.each(products, function (key, product) {
                     if (!adminMode) {
-                        let btnLabel = totalPrice ? '[[labels.remove]]' : '[[labels.add]]';
-                        html += [
-                            '<tr>',
-                            '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
-                            + product.image_url
-                            + '" alt="[[labels.product_image]]"></td>',
-                            '<td>' + product.title + '</td>',
-                            '<td>' + product.description + '</td>',
-                            '<td class="price">' + product.price + '</td>',
-                            '<td><button class="actionBtn" value="' + product.id + '">' + btnLabel + '</button></td>',
-                            '</tr>'
-                        ].join('');
+                        html += renderRow(product, totalPrice);
                     } else {
-                        html += [
-                            '<tr>',
-                            '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
-                            + product.image_url
-                            + '" alt="[[labels.product_image]]"></td>',
-                            '<td>' + product.title + '</td>',
-                            '<td>' + product.description + '</td>',
-                            '<td class="price">' + product.price + '</td>',
-                            '<td><a href class="editProduct" data-id="' + product.id + '">[[labels.edit]]</a></td>',
-                            '<td><a href class="deleteProduct" data-id="' + product.id + '">[[labels.delete]]</a></td>',
-                            '</tr>'
-                        ].join('');
+                        html += renderAdminRow(product);
                     }
                 });
 
                 if (!adminMode && totalPrice) {
-                    html += [
-                        '<tr>',
-                        '<td id="totalPrice" colspan="2">[[labels.total_price]]: <span>' + totalPrice + '</span></td>',
-                        '</tr>'
-                    ].join('');
+                    html += renderTotalPrice(totalPrice);
                 }
 
                 return html;
             }
 
+            function renderRow(product, totalPrice) {
+                let btnLabel = totalPrice ? '[[labels.remove]]' : '[[labels.add]]';
+                let row = [
+                    '<tr>',
+                    '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
+                    + product.image_url
+                    + '" alt="[[labels.product_image]]"></td>',
+                    '<td>' + product.title + '</td>',
+                    '<td>' + product.description + '</td>',
+                    '<td class="price">' + product.price + '</td>',
+                    '<td><button class="actionBtn" value="' + product.id + '">' + btnLabel + '</button></td>',
+                    '</tr>'
+                ].join('');
+
+                return row;
+            }
+
+            function renderAdminRow(product) {
+                let adminRow = [
+                    '<tr>',
+                    '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
+                    + product.image_url
+                    + '" alt="[[labels.product_image]]"></td>',
+                    '<td>' + product.title + '</td>',
+                    '<td>' + product.description + '</td>',
+                    '<td class="price">' + product.price + '</td>',
+                    '<td><a href class="editProduct" data-id="' + product.id + '">[[labels.edit]]</a></td>',
+                    '<td><a href class="deleteProduct" data-id="' + product.id + '">[[labels.delete]]</a></td>',
+                    '</tr>'
+                ].join('');
+
+                return adminRow;
+            }
+
+            function renderTotalPrice(totalPrice) {
+                let totalPriceRow = [
+                    '<tr>',
+                    '<td id="totalPrice" colspan="2">[[labels.total_price]]: <span>' + totalPrice + '</span></td>',
+                    '</tr>'
+                ].join('');
+
+                return totalPriceRow;
+            }
+
             window.onhashchange = function () {
                 $('.page').hide();
+                const regex = /(?<=^#products\/)\d+(?=\/edit$)/g;
+                const editProductId = window.location.hash.match(regex)
+                    ? window.location.hash.match(/(?<=^#products\/)\d+(?=\/edit$)/g)[0] : null;
 
                 switch (window.location.hash) {
                     case '#cart':
@@ -173,6 +194,7 @@
                             });
                         });
                         break;
+
                     case '#products':
                         $.ajax(config.productDisplay, {
                             dataType: 'json',
@@ -183,24 +205,10 @@
                                 $('.products .list').on('click', 'a', function (e) {
                                     e.preventDefault();
                                     const id = $(this).attr('data-id');
-                                    let url;
-                                    if ($(e.target).attr('class') === 'editProduct') {
-                                        url = config.productEdit.replace(':id', id);
-                                        $.ajax(url, {
-                                            dataType: 'json',
-                                            success: function (response) {
-                                                $('.products').hide();
-                                                $('.product').html(trans($('.product').html())).show();
-                                                $('#title').val(response.title);
-                                                $('#description').val(response.description);
-                                                $('#price').val(response.price);
-                                            },
-                                            error: function () {
-                                                window.location.hash = '#';
-                                            }
-                                        });
+                                     if ($(e.target).attr('class') === 'editProduct') {
+                                        window.location.hash = '#products/' + id + '/edit';
                                     } else {
-                                        url = config.productDestroy.replace(':id', id);
+                                        let url = config.productDestroy.replace(':id', id);
                                         $.ajax(url, {
                                             type: 'DELETE',
                                             dataType: 'json',
@@ -221,6 +229,21 @@
                                         },
                                     });
                                 })
+                            },
+                            error: function () {
+                                window.location.hash = '#';
+                            }
+                        });
+                        break;
+                    case '#products/' + editProductId + '/edit':
+                        let url = config.productEdit.replace(':id', editProductId);
+                        $.ajax(url, {
+                            dataType: 'json',
+                            success: function (response) {
+                                $('.product').html(trans($('.product').html())).show();
+                                $('#title').val(response.title);
+                                $('#description').val(response.description);
+                                $('#price').val(response.price);
                             },
                             error: function () {
                                 window.location.hash = '#';
