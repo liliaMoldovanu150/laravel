@@ -64,7 +64,11 @@ class ProductController extends Controller
         $newProduct->image_url = $this->uploadImage($request);
         $newProduct->save();
 
-        return redirect(route('product.display'));
+        if ($request->ajax()) {
+            return response()->json(['success' => true], 200);
+        } else {
+            return redirect(route('product.display'));
+        }
     }
 
     public function edit(Product $product, Request $request)
@@ -100,7 +104,11 @@ class ProductController extends Controller
 
         }
 
-        return redirect(route('product.display'));
+        if ($request->ajax()) {
+            return response()->json(['success' => true], 200);
+        } else {
+            return redirect(route('product.display'));
+        }
     }
 
     public function destroy(Product $product, Request $request)

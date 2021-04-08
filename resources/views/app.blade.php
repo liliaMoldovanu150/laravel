@@ -148,15 +148,14 @@
                         $('#checkoutForm').on('submit', function (e) {
                             $('form span').hide();
                             e.preventDefault();
+                            const formData = new FormData(this);
+                            formData.append('totalPrice', $('#totalPrice span').text())
                             $.ajax(config.orderStore, {
                                 type: 'POST',
                                 dataType: 'json',
-                                data: {
-                                    name: $('#name').val(),
-                                    details: $('#details').val(),
-                                    comments: $('#comments').val(),
-                                    totalPrice: $('#totalPrice span').text(),
-                                },
+                                contentType: false,
+                                processData: false,
+                                data: formData,
                                 success: function () {
                                     window.location.hash = '#';
                                 },
@@ -175,13 +174,13 @@
                         $('#loginForm').on('submit', function (e) {
                             $('form span').hide();
                             e.preventDefault();
+                            const formData = new FormData(this);
                             $.ajax(config.login, {
                                 type: 'POST',
                                 dataType: 'json',
-                                data: {
-                                    email: $('#email').val(),
-                                    password: $('#password').val(),
-                                },
+                                contentType: false,
+                                processData: false,
+                                data: formData,
                                 success: function () {
                                     window.location.hash = '#';
                                 },
@@ -205,7 +204,7 @@
                                 $('.products .list').on('click', 'a', function (e) {
                                     e.preventDefault();
                                     const id = $(this).attr('data-id');
-                                     if ($(e.target).attr('class') === 'editProduct') {
+                                    if ($(e.target).attr('class') === 'editProduct') {
                                         window.location.hash = '#products/' + id + '/edit';
                                     } else {
                                         let url = config.productDestroy.replace(':id', id);
@@ -241,9 +240,33 @@
                             dataType: 'json',
                             success: function (response) {
                                 $('.product').html(trans($('.product').html())).show();
+                                $('#productForm span').hide();
                                 $('#title').val(response.title);
                                 $('#description').val(response.description);
                                 $('#price').val(response.price);
+
+                                $('#productForm').on('submit', function (e) {
+                                    url = config.productUpdate.replace(':id', editProductId);
+                                    const formData = new FormData(this);
+                                    formData.append('_method', 'PUT');
+                                    e.preventDefault();
+                                    $.ajax(url, {
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        contentType: false,
+                                        processData: false,
+                                        data: formData,
+                                        success: function () {
+                                            window.location.hash = '#products';
+                                        },
+                                        error: function (response) {
+                                            let errors = response.responseJSON.errors;
+                                            for (let error in errors) {
+                                                $('span.' + error).text(errors[error]).show();
+                                            }
+                                        }
+                                    });
+                                })
                             },
                             error: function () {
                                 window.location.hash = '#';
@@ -255,6 +278,28 @@
                             dataType: 'json',
                             success: function () {
                                 $('.product').html(trans($('.product').html())).show();
+
+                                $('#productForm').on('submit', function (e) {
+                                    $('#productForm span').hide();
+                                    e.preventDefault();
+                                    const formData = new FormData(this);
+                                    $.ajax(config.productStore, {
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        contentType: false,
+                                        processData: false,
+                                        data: formData,
+                                        success: function () {
+                                            window.location.hash = '#products';
+                                        },
+                                        error: function (response) {
+                                            let errors = response.responseJSON.errors;
+                                            for (let error in errors) {
+                                                $('span.' + error).text(errors[error]).show();
+                                            }
+                                        }
+                                    });
+                                })
                             },
                             error: function () {
                                 window.location.hash = '#';
@@ -376,7 +421,7 @@
             name="title"
             placeholder="[[labels.title]]"
         >
-        <span class="error"></span>
+        <span class="error title"></span>
         <br><br>
         <textarea
             id="description"
@@ -386,7 +431,7 @@
             name="description"
             placeholder="[[labels.description]]"
         ></textarea>
-        <span class="error"></span>
+        <span class="error description"></span>
         <br><br>
         <input
             id="price"
@@ -396,19 +441,18 @@
             step="0.01"
             placeholder="[[labels.price]]"
         >
-        <span class="error"></span>
+        <span class="error price"></span>
         <br><br>
         <input
             id="image"
             type="file"
             name="image"
         >
-        <span class="error"></span>
+        <span class="error image"></span>
         <br><br>
         <input type="submit" value="[[labels.save]]">
     </form>
     <a href="#products">[[labels.products]]</a>
 </div>
-
 </body>
 </html>
