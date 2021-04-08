@@ -45,9 +45,25 @@ class OrderController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $orders = Order::with('products')->get();
-        return view('orders.index', compact('orders'));
+
+        if ($request->ajax()) {
+            return response()->json($orders);
+        } else {
+            return view('orders.index', compact('orders'));
+        }
+    }
+
+    public function show(Order $order, Request $request)
+    {
+        $order = Order::with('products')->find($order->id);
+
+        if ($request->ajax()) {
+            return response()->json($order);
+        } else {
+            return view('orders.show', compact('order'));
+        }
     }
 }

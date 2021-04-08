@@ -19,6 +19,7 @@
             'productEdit': '{{ route('product.edit', ':id') }}',
             'productUpdate': '{{ route('product.update', ':id') }}',
             'orderIndex': '{{ route('order.index') }}',
+            'orderShow': '{{ route('order.show', ':id') }}',
             'logout': '{{ route('logout') }}'
         }
 
@@ -109,11 +110,35 @@
                 return totalPriceRow;
             }
 
+            function renderOrders(orders) {
+                let orderRow = [
+                    '<tr>',
+                    '<th>[[labels.id]]</th>',
+                    '<th>[[labels.order_total]]</th>',
+                    '</tr>'
+                ].join('');
+
+                $.each(orders, function (key, order) {
+                    orderRow += [
+                        '<tr>',
+                        '<td><a href>' + order.id + '</a></td>',
+                        '<td>' + order.total_price + '</td>',
+                        '</tr>'
+                    ].join('');
+                });
+
+                return orderRow;
+            }
+
             window.onhashchange = function () {
                 $('.page').hide();
-                const regex = /(?<=^#products\/)\d+(?=\/edit$)/g;
-                const editProductId = window.location.hash.match(regex)
-                    ? window.location.hash.match(/(?<=^#products\/)\d+(?=\/edit$)/g)[0] : null;
+                const regexEdit = /(?<=^#products\/)\d+(?=\/edit$)/g;
+                const editProductId = window.location.hash.match(regexEdit)
+                    ? window.location.hash.match(regexEdit)[0] : null;
+
+                const regexOrder = /(?<=^#orders\/)\d+$/g;
+                const orderId = window.location.hash.match(regexOrder)
+                    ? window.location.hash.match(regexOrder)[0] : null;
 
                 switch (window.location.hash) {
                     case '#cart':
@@ -193,7 +218,6 @@
                             });
                         });
                         break;
-
                     case '#products':
                         $.ajax(config.productDisplay, {
                             dataType: 'json',
@@ -306,6 +330,31 @@
                             }
                         });
                         break;
+                    case '#orders':
+                        $('.orders').html(trans($('.orders').html())).show();
+
+                        $.ajax(config.orderIndex, {
+                            dataType: 'json',
+                            success: function (response) {
+                                $('.orders .ordersList').html(trans(renderOrders(response)));
+
+                                $('.orders .ordersList').on('click', 'a', function (e) {
+                                    e.preventDefault();
+                                    const id = $(this).text();
+                                    window.location.hash = '#orders/' + id;
+                                })
+                            }
+                        });
+                        break;
+                    case '#orders/' + orderId:
+                        let orderShowUrl = config.orderShow.replace(':id', orderId);
+                        $.ajax(orderShowUrl, {
+                            dataType: 'json',
+                            success: function (response) {
+                                $('.order').html(trans($('.order').html())).show();
+                            }
+                        });
+                        break;
                     default:
                         $('.index').html(trans($('.index').html())).show();
 
@@ -319,7 +368,7 @@
                                     $('.index .list').html(trans(renderList(response)));
                                 }
 
-                                $('.index .list').on('click', '.actionBtn', function (e) {
+                                $('.index .list').on('click', '.actionBtn', function () {
                                     const id = $(this).val();
                                     let url = config.cartStore.replace(':id', id);
                                     $.ajax(url, {
@@ -453,6 +502,15 @@
         <input type="submit" value="[[labels.save]]">
     </form>
     <a href="#products">[[labels.products]]</a>
+</div>
+
+<div class="page orders">
+    <h1 class="heading">[[labels.orders]]</h1>
+    <table class="ordersList" style="border: 1px solid black"></table>
+</div>
+
+<div class="page order">
+    <h1 class="heading">[[labels.order]]</h1>
 </div>
 </body>
 </html>
