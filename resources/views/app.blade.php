@@ -71,12 +71,12 @@
                 let row = [
                     '<tr>',
                     '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
-                    + product.image_url
+                    + product['image_url']
                     + '" alt="[[labels.product_image]]"></td>',
-                    '<td>' + product.title + '</td>',
-                    '<td>' + product.description + '</td>',
-                    '<td class="price">' + product.price + '</td>',
-                    '<td><button class="actionBtn" value="' + product.id + '">' + btnLabel + '</button></td>',
+                    '<td>' + product['title'] + '</td>',
+                    '<td>' + product['description'] + '</td>',
+                    '<td class="price">' + product['price'] + '</td>',
+                    '<td><button class="actionBtn" value="' + product['id'] + '">' + btnLabel + '</button></td>',
                     '</tr>'
                 ].join('');
 
@@ -87,13 +87,13 @@
                 let adminRow = [
                     '<tr>',
                     '<td><img style="width: 100px; height: 100px; object-fit: cover" src="./images/'
-                    + product.image_url
+                    + product['image_url']
                     + '" alt="[[labels.product_image]]"></td>',
-                    '<td>' + product.title + '</td>',
-                    '<td>' + product.description + '</td>',
-                    '<td class="price">' + product.price + '</td>',
-                    '<td><a href class="editProduct" data-id="' + product.id + '">[[labels.edit]]</a></td>',
-                    '<td><a href class="deleteProduct" data-id="' + product.id + '">[[labels.delete]]</a></td>',
+                    '<td>' + product['title'] + '</td>',
+                    '<td>' + product['description'] + '</td>',
+                    '<td class="price">' + product['price'] + '</td>',
+                    '<td><a href class="editProduct" data-id="' + product['id'] + '">[[labels.edit]]</a></td>',
+                    '<td><a href class="deleteProduct" data-id="' + product['id'] + '">[[labels.delete]]</a></td>',
                     '</tr>'
                 ].join('');
 
@@ -121,8 +121,8 @@
                 $.each(orders, function (key, order) {
                     orderRow += [
                         '<tr>',
-                        '<td><a href>' + order.id + '</a></td>',
-                        '<td>' + order.total_price + '</td>',
+                        '<td><a href>' + order['id'] + '</a></td>',
+                        '<td>' + order['total_price'] + '</td>',
                         '</tr>'
                     ].join('');
                 });
@@ -141,8 +141,46 @@
                 return sum;
             }
 
+            function renderSingleOrder(order, orderProducts) {
+                let html = [
+                    '<tr>',
+                    '<th>[[labels.id]]</th>',
+                    '<th>[[labels.date]]</th>',
+                    '<th>[[labels.name]]</th>',
+                    '<th>[[labels.contact_details]]</th>',
+                    '<th>[[labels.comments]]</th>',
+                    '<th>[[labels.products]]</th>',
+                    '</tr>',
+                    '<tr>',
+                    '<td>' + order['id'] + '</td>',
+                    '<td>' + order['created_at'] + '</td>',
+                    '<td>' + order['name'] + '</td>',
+                    '<td>' + order['contact_details'] + '</td>',
+                    '<td>' + order['comments'] + '</td>',
+                    '<td><table>',
+                ].join('');
+
+                $.each(orderProducts, function (key, orderProduct) {
+                    html += [
+                        '<tr>',
+                        '<td><img style="width: 40px; height: 40px; object-fit: cover" src="./images/'
+                        + orderProduct['image_url']
+                        + '" alt="[[labels.product_image]]"></td>',
+                        '<td>' + orderProduct['title'] + '</td>',
+                        '<td class="price">' + orderProduct['price'] + '</td>',
+                        '</tr>'
+                    ].join('');
+                });
+
+                html += ['</table></td></tr>'].join('');
+                html += renderTotalPrice(order['total_price']);
+
+                return html;
+            }
+
             window.onhashchange = function () {
                 $('.page').hide();
+
                 const regexEdit = /(?<=^#products\/)\d+(?=\/edit$)/g;
                 const editProductId = window.location.hash.match(regexEdit)
                     ? window.location.hash.match(regexEdit)[0] : null;
@@ -165,7 +203,8 @@
                                     $('.cart .list, #checkoutForm').show();
                                     $('#emptyCart').hide();
                                 }
-                                $('.cart .list').html(trans(renderList(response['cartProducts'], response['totalPrice'])));
+                                $('.cart .list')
+                                    .html(trans(renderList(response['cartProducts'], response['totalPrice'])));
 
                                 $('.cart .list').on('click', '.actionBtn', function (e) {
                                     const id = $(this).val();
@@ -193,7 +232,7 @@
                             $('form span').hide();
                             e.preventDefault();
                             const formData = new FormData(this);
-                            formData.append('totalPrice', $('#totalPrice span').text())
+                            formData.append('totalPrice', $('#totalPrice span').text());
                             $.ajax(config.orderStore, {
                                 type: 'POST',
                                 dataType: 'json',
@@ -204,7 +243,7 @@
                                     window.location.hash = '#';
                                 },
                                 error: function (response) {
-                                    let errors = response.responseJSON.errors;
+                                    const errors = response.responseJSON.errors;
                                     for (let error in errors) {
                                         $('span.' + error).text(errors[error]).show();
                                     }
@@ -229,7 +268,7 @@
                                     window.location.hash = '#';
                                 },
                                 error: function (response) {
-                                    let errors = response.responseJSON.errors;
+                                    const errors = response.responseJSON.errors;
                                     for (let error in errors) {
                                         $('span.' + error).text(errors[error]).show();
                                     }
@@ -303,7 +342,7 @@
                                             window.location.hash = '#products';
                                         },
                                         error: function (response) {
-                                            let errors = response.responseJSON.errors;
+                                            const errors = response.responseJSON.errors;
                                             for (let error in errors) {
                                                 $('span.' + error).text(errors[error]).show();
                                             }
@@ -336,7 +375,7 @@
                                             window.location.hash = '#products';
                                         },
                                         error: function (response) {
-                                            let errors = response.responseJSON.errors;
+                                            const errors = response.responseJSON.errors;
                                             for (let error in errors) {
                                                 $('span.' + error).text(errors[error]).show();
                                             }
@@ -350,11 +389,10 @@
                         });
                         break;
                     case '#orders':
-                        $('.orders').html(trans($('.orders').html())).show();
-
                         $.ajax(config.orderIndex, {
                             dataType: 'json',
                             success: function (response) {
+                                $('.orders').html(trans($('.orders').html())).show();
                                 $('.orders .ordersList').html(trans(renderOrders(response)));
 
                                 $('.orders .ordersList').on('click', 'a', function (e) {
@@ -362,6 +400,9 @@
                                     const id = $(this).text();
                                     window.location.hash = '#orders/' + id;
                                 })
+                            },
+                            error: function () {
+                                window.location.hash = '#';
                             }
                         });
                         break;
@@ -371,6 +412,11 @@
                             dataType: 'json',
                             success: function (response) {
                                 $('.order').html(trans($('.order').html())).show();
+                                $('.order .singleOrder')
+                                    .html(trans(renderSingleOrder(response['order'], response['orderProducts'])));
+                            },
+                            error: function () {
+                                window.location.hash = '#';
                             }
                         });
                         break;
@@ -423,6 +469,7 @@
     <p id="emptyCart" style="display: none">[[labels.empty_cart]]</p>
     <form id="checkoutForm">
         <input
+            required
             id="name"
             type="text"
             name="name"
@@ -431,6 +478,7 @@
         <span class="error name" style="display: none"></span>
         <br><br>
         <input
+            required
             id="details"
             type="text"
             name="details"
@@ -446,13 +494,13 @@
         <br><br>
         <input type="submit" value="[[labels.checkout]]">
     </form>
-
     <a href="#" class="button">[[labels.go_to_index]]</a>
 </div>
 
 <div class="page login">
     <form id="loginForm">
         <input
+            required
             id="email"
             type="email"
             name="email"
@@ -462,6 +510,7 @@
         <span class="error email" style="display: none"></span>
         <br>
         <input
+            required
             id="password"
             type="password"
             name="password"
@@ -484,6 +533,7 @@
 <div class="page product">
     <form id="productForm" enctype="multipart/form-data">
         <input
+            required
             id="title"
             type="text"
             name="title"
@@ -492,6 +542,7 @@
         <span class="error title"></span>
         <br><br>
         <textarea
+            required
             id="description"
             rows="5"
             cols="20"
@@ -502,6 +553,7 @@
         <span class="error description"></span>
         <br><br>
         <input
+            required
             id="price"
             type="number"
             name="price"
@@ -530,6 +582,7 @@
 
 <div class="page order">
     <h1 class="heading">[[labels.order]]</h1>
+    <table class="singleOrder" style="border: 1px solid black"></table>
 </div>
 </body>
 </html>
