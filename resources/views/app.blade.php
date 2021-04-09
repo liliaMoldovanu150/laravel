@@ -130,6 +130,17 @@
                 return orderRow;
             }
 
+            function getTotalPrice() {
+                let sum = 0;
+                if ($('.cart .price').length > 0) {
+                    $('.cart .price').each(function () {
+                        sum += parseFloat($(this).text());
+                    });
+                }
+
+                return sum;
+            }
+
             window.onhashchange = function () {
                 $('.page').hide();
                 const regexEdit = /(?<=^#products\/)\d+(?=\/edit$)/g;
@@ -163,7 +174,15 @@
                                         type: 'DELETE',
                                         dataType: 'json',
                                         success: function () {
-                                            location.reload();
+                                            $(e.target).parents('tr').remove();
+                                            let totalPrice = getTotalPrice();
+                                            if (totalPrice) {
+                                                $('#totalPrice span').text(totalPrice);
+                                            } else {
+                                                $('#totalPrice').remove();
+                                                $('.cart .list, #checkoutForm').hide();
+                                                $('#emptyCart').show();
+                                            }
                                         }
                                     });
                                 });
@@ -236,7 +255,7 @@
                                             type: 'DELETE',
                                             dataType: 'json',
                                             success: function () {
-                                                location.reload();
+                                                $(e.target).parents('tr').remove();
                                             }
                                         });
                                     }
@@ -368,14 +387,14 @@
                                     $('.index .list').html(trans(renderList(response)));
                                 }
 
-                                $('.index .list').on('click', '.actionBtn', function () {
+                                $('.index .list').on('click', '.actionBtn', function (e) {
                                     const id = $(this).val();
                                     let url = config.cartStore.replace(':id', id);
                                     $.ajax(url, {
                                         type: 'POST',
                                         dataType: 'json',
                                         success: function () {
-                                            location.reload();
+                                            $(e.target).parents('tr').remove();
                                         }
                                     });
                                 })
