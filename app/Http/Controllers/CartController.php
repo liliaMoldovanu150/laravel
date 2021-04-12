@@ -18,7 +18,7 @@ class CartController extends Controller
 
     public function store(Product $product)
     {
-        if (Product::find($product->id)) {
+        if (Product::findOrFail($product->id)) {
             if (session()->exists('cartProducts')) {
                 session()->push('cartProducts', $product->id);
             } else {

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="content-wrapper">
         @if ($cartProducts->count())
             @foreach ($cartProducts as $cartProduct)
@@ -21,10 +22,12 @@
                 </div>
                 <br>
             @endforeach
-            <div class="total-price"><strong>{{ __('labels.total_price') }}:</strong> {{ number_format($totalPrice, 2) }}</div>
+            <div class="total-price">
+                <strong>{{ __('labels.total_price') }}:</strong> {{ number_format($totalPrice, 2) }}
+            </div>
             <form class="cart-form" action="{{ route('order.store') }}" method="POST">
                 @csrf
-                <input type="hidden" name="totalPrice" value="{{ $totalPrice }}">
+                <input type="hidden" name="total_price" value="{{ $totalPrice }}">
                 <input
                     type="text"
                     name="name"
@@ -37,8 +40,8 @@
                 <br><br>
                 <input
                     type="text"
-                    name="details"
-                    value="{{ old('details') }}"
+                    name="contact_details"
+                    value="{{ old('contact_details') }}"
                     placeholder="{{ __('labels.contact_details') }}"
                 >
                 @error('details')
@@ -57,4 +60,5 @@
         @endif
         <a class="go" href="{{ route('product.index') }}">{{ __('labels.go_to_index') }}</a>
     </div>
+
 @endsection

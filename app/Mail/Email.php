@@ -33,6 +33,6 @@ class Email extends Mailable
     public function build()
     {
         return $this->view('email.email')
-            ->subject(__('labels.order'). ': ' . $this->order->id);
+            ->subject(__('labels.order') . ': ' . $this->order->id);
     }
 }
