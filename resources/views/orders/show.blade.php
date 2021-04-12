@@ -25,8 +25,9 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="total-price"><strong>{{ __('labels.order_total') }}
-                        :</strong> {{ number_format($order->total_price, 2) }}</div>
+                <div class="total-price"><strong>{{ __('labels.order_total') }}:</strong>
+                    {{ number_format($order->total_price, 2) }}
+                </div>
             </div>
         </div>
         <hr>
