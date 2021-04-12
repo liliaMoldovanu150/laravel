@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="content-wrapper">
-        <h1 class="heading">{{ __('labels.enjoy') }}</h1>
         @if ($products->count())
             @foreach ($products as $product)
                 <div class="product-item">
@@ -23,7 +23,8 @@
             @endforeach
         @else
             <p class="message">{{ __('labels.all_added') }}</p>
-    @endif
-            <a class="go" href="{{ route('cart.show') }}">{{ __('labels.go_to_cart') }}</a>
-        </div>
+        @endif
+        <a class="go" href="{{ route('cart.show') }}">{{ __('labels.go_to_cart') }}</a>
+    </div>
+
 @endsection
