@@ -20,15 +20,11 @@ class OrderController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'details' => 'required',
+            'contact_details' => 'required',
             'comments' => 'nullable',
         ]);
 
-        $newOrder = new Order();
-        $newOrder->name = $request->name;
-        $newOrder->contact_details = $request->details;
-        $newOrder->comments = $request->comments ?? '';
-        $newOrder->total_price = $request->totalPrice;
+        $newOrder = Order::create($request->all());
         $newOrder->save();
 
         $cartProducts = session()->get('cartProducts');
