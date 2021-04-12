@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use function GuzzleHttp\Promise\all;
 
 class ProductController extends Controller
 {
@@ -67,15 +68,11 @@ class ProductController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:100000'
         ]);
 
-        Product::where('id', $product->id)
-            ->update([
-                'title' => $request->title,
-                'description' => $request->description,
-                'price' => $request->price,
-            ]);
+        Product::find($product->id)
+            ->update($request->all());
 
         if ($request->file('image')) {
-            Product::where('id', $product->id)
+            Product::find($product->id)
                 ->update([
                     'image_url' => $this->uploadImage($request)
                 ]);

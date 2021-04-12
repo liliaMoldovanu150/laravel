@@ -32,6 +32,5 @@ return [
     'id' => 'ID',
     'date' => 'Date',
      'cart' => 'Your cart',
-    'from' => 'from',
-    'enjoy' => 'Enjoy your shopping!'
+    'from' => 'from'
 ];

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="content-wrapper">
         <h1 class="heading">{{ __('labels.products') }}</h1>
         @foreach ($products as $product)
@@ -32,4 +33,5 @@
             </form>
         </div>
     </div>
+
 @endsection

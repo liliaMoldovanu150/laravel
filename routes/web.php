@@ -28,7 +28,8 @@ Route::middleware(['admin'])->group(function () {
     });
 
 Route::post('/cart/{product}', [App\Http\Controllers\CartController::class, 'store'])->name('cart.store');
-Route::delete('/cart/{product}', [App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy');
+Route::delete('/cart/{product}', [App\Http\Controllers\CartController::class, 'destroy'])
+    ->name('cart.destroy');
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'show'])->name('cart.show');
 
 Route::post('/order', [App\Http\Controllers\OrderController::class, 'store'])->name('order.store');

@@ -39,7 +39,8 @@
                     @Auth
                         @if (Auth::user()->is_admin == 1)
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('product.display') }}">{{ __('labels.products') }}</a>
+                                <a class="nav-link"
+                                   href="{{ route('product.display') }}">{{ __('labels.products') }}</a>
                             </li>
 
                             <li class="nav-item">
