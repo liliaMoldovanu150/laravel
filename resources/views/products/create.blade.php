@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="content-wrapper">
         <form action="{{ route('product.store')}}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -49,4 +50,5 @@
         </form>
         <a class="go" href="{{ route('product.display') }}">{{ __('labels.products') }}</a>
     </div>
+
 @endsection
