@@ -25,7 +25,8 @@ class CartController extends Controller
                 session()->put('cartProducts', [$product->id]);
             }
         }
-        return redirect()->back();
+//        return redirect()->back();
+        return response()->json('ok');
     }
 
     public function destroy(Product $product)

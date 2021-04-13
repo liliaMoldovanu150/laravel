@@ -13,7 +13,9 @@ class ProductController extends Controller
     {
         $cartProducts = session('cartProducts');
         $products = Product::whereNotIn('id', $cartProducts ?? [])->get();
-        return view('products.index', compact('products'));
+//        return view('products.index', compact('products'));
+
+        return response()->json($products);
     }
 
     public function display()
