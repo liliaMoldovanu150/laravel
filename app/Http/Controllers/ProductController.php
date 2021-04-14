@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use function GuzzleHttp\Promise\all;
 
 class ProductController extends Controller
 {
@@ -40,16 +39,16 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $productValues = $request->validate([
             'title' => 'required',
             'description' => 'required',
             'price' => 'required',
             'image' => 'required|mimes:jpg,jpeg,png,gif|max:100000'
         ]);
 
-        $newProduct = Product::create($request->all());
-        $newProduct->image_url = $this->uploadImage($request);
-        $newProduct->save();
+        $productValues['image_url'] = $this->uploadImage($request);
+
+        Product::create($productValues);
 
         return redirect(route('product.display'));
     }
@@ -61,15 +60,14 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $productValues = $request->validate([
             'title' => 'required',
             'description' => 'required',
             'price' => 'required',
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:100000'
         ]);
 
-        Product::find($product->id)
-            ->update($request->all());
+        Product::find($product->id)->update($productValues);
 
         if ($request->file('image')) {
             Product::find($product->id)
@@ -84,7 +82,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        File::delete('./images/' .$product->image_url);
+        File::delete('./images/' . $product->image_url);
         Product::destroy($product->id);
 
         return redirect()->back();

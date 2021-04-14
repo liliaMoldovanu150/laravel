@@ -18,14 +18,14 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $orderValues = $request->validate([
             'name' => 'required',
             'contact_details' => 'required',
             'comments' => 'nullable',
         ]);
 
-        $newOrder = Order::create($request->all());
-        $newOrder->save();
+        $orderValues['total_price'] = $request->only('total_price')['total_price'];
+        $newOrder = Order::create($orderValues);
 
         $cartProducts = session()->get('cartProducts');
 
@@ -33,7 +33,7 @@ class OrderController extends Controller
             $newOrder->products()->attach([$cartProduct => ['product_price' => Product::find($cartProduct)->price]]);
         }
 
-        $orderProducts = $newOrder->products->toArray();
+        $orderProducts = $newOrder->products;
 
         Mail::to(config('mail.manager_email'))
             ->send(new Email($newOrder, $orderProducts));
