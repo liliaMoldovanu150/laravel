@@ -67,11 +67,10 @@ class ProductController extends Controller
             'image' => 'nullable|mimes:jpg,jpeg,png,gif|max:100000'
         ]);
 
-        Product::find($product->id)->update($productValues);
+        $product->update($productValues);
 
         if ($request->file('image')) {
-            Product::find($product->id)
-                ->update([
+            $product->update([
                     'image_url' => $this->uploadImage($request)
                 ]);
 

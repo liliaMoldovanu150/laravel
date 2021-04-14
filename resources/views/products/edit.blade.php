@@ -9,7 +9,7 @@
             <input
                 type="text"
                 name="title"
-                value="{{ $product->title ?? old('title') }}"
+                value="{{ old('title') ?? $product->title }}"
                 placeholder="{{ __('labels.title') }}"
             >
             @error('title')
@@ -22,7 +22,7 @@
                 type="text"
                 name="description"
                 placeholder="{{ __('labels.description') }}"
-            >{{ $product->description ?? old('description') }}</textarea>
+            >{{ old('description') ?? $product->description }}</textarea>
             @error('description')
             <span class="error">{{ $message }}</span>
             @enderror
@@ -32,7 +32,7 @@
                 name="price"
                 min="0.00"
                 step="0.01"
-                value="{{ $product->price ?? old('price') }}"
+                value="{{ old('price') ?? $product->price }}"
                 placeholder="{{ __('labels.price') }}"
             >
             @error('price')
