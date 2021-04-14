@@ -181,13 +181,12 @@
             window.onhashchange = function () {
                 $('.page').hide();
 
+                let hash = window.location.hash;
                 const regexEdit = /(?<=^#products\/)\d+(?=\/edit$)/g;
-                const editProductId = window.location.hash.match(regexEdit)
-                    ? window.location.hash.match(regexEdit)[0] : null;
+                const editProductId = hash.match(regexEdit) ? hash.match(regexEdit)[0] : null;
 
                 const regexOrder = /(?<=^#orders\/)\d+$/g;
-                const orderId = window.location.hash.match(regexOrder)
-                    ? window.location.hash.match(regexOrder)[0] : null;
+                const orderId = hash.match(regexOrder) ? hash.match(regexOrder)[0] : null;
 
                 switch (window.location.hash) {
                     case '#cart':
@@ -232,7 +231,6 @@
                             $('form span').hide();
                             e.preventDefault();
                             const formData = new FormData(this);
-                            formData.append('totalPrice', $('#totalPrice span').text());
                             $.ajax(config.orderStore, {
                                 type: 'POST',
                                 dataType: 'json',
@@ -481,10 +479,10 @@
             required
             id="details"
             type="text"
-            name="details"
+            name="contact_details"
             placeholder="[[labels.contact_details]]"
         >
-        <span class="error details" style="display: none"></span>
+        <span class="error contact_details" style="display: none"></span>
         <br><br>
         <textarea
             id="comments"

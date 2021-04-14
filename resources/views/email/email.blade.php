@@ -23,13 +23,13 @@
         <div style="max-width: 100px; height: 100px; align-self: center">
             <img
                 style="width: 100%; height: 100%; object-fit: cover"
-                src="{{ url('/') }}/images/{{ $orderProduct['image_url'] }}"
+                src="{{ url('/') }}/images/{{ $orderProduct->image_url }}"
                 alt="{{ __('labels.product_image') }}">
         </div>
         <div style="max-width: 580px; flex-grow: 2">
-            <h4>{{ $orderProduct['title'] }}</h4>
-            <p>{{ $orderProduct['description'] }}</p>
-            <div>{{ number_format($orderProduct['price'], 2) }}</div>
+            <h4>{{ $orderProduct->title }}</h4>
+            <p>{{ $orderProduct->description }}</p>
+            <div>{{ number_format($orderProduct->price, 2) }}</div>
         </div>
     </div>
 @endforeach

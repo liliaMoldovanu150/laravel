@@ -15,31 +15,22 @@ class CartController extends Controller
             $totalPrice += $cartProduct->price;
         }
 
-        if ($request->ajax()) {
-            return response()->json([
+        return $request->wantsJson()
+            ? response()->json([
                 'cartProducts' => $cartProducts,
                 'totalPrice' => $totalPrice
-            ]);
-        } else {
-            return view('cart.show', compact('cartProducts', 'totalPrice'));
-        }
+            ])
+            : view('cart.show', compact('cartProducts', 'totalPrice'));
     }
 
     public function store(Product $product, Request $request)
     {
-        if (Product::find($product->id)) {
-            if (session()->exists('cartProducts')) {
-                session()->push('cartProducts', $product->id);
-            } else {
-                session()->put('cartProducts', [$product->id]);
-            }
-        }
+        $ids = session()->get('cartProducts', []);
+        session()->put('cartProducts', [...$ids, $product->id]);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true], 200);
-        } else {
-            return redirect()->back();
-        }
+        return $request->wantsJson()
+            ? response()->json(['success' => true], 200)
+            : redirect()->back();
     }
 
     public function destroy(Product $product, Request $request)
@@ -49,10 +40,8 @@ class CartController extends Controller
         unset($cartProducts[$key]);
         session()->put('cartProducts', $cartProducts);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true], 200);
-        } else {
-            return redirect()->back();
-        }
+        return $request->wantsJson()
+            ? response()->json(['success' => true], 200)
+            : redirect()->back();
     }
 }

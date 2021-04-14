@@ -24,7 +24,7 @@
             <div class="total-price"><strong>{{ __('labels.total_price') }}:</strong> {{ number_format($totalPrice, 2) }}</div>
             <form class="cart-form" action="{{ route('order.store') }}" method="POST">
                 @csrf
-                <input type="hidden" name="totalPrice" value="{{ $totalPrice }}">
+                <input type="hidden" name="total_price" value="{{ $totalPrice }}">
                 <input
                     type="text"
                     name="name"
@@ -37,11 +37,11 @@
                 <br><br>
                 <input
                     type="text"
-                    name="details"
-                    value="{{ old('details') }}"
+                    name="contact_details"
+                    value="{{ old('contact_details') }}"
                     placeholder="{{ __('labels.contact_details') }}"
                 >
-                @error('details')
+                @error('contact_details')
                 <span class="error">{{ $message }}</span>
                 @enderror
                 <br><br>
