@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use function GuzzleHttp\Promise\all;
 
 class ProductController extends Controller
 {
     public function index()
     {
         $cartProducts = session('cartProducts');
+
         $products = Product::whereNotIn('id', $cartProducts ?? [])->get();
-//        return view('products.index', compact('products'));
 
         return response()->json($products);
     }

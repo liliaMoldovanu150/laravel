@@ -1,27 +1,28 @@
 import React, {Component} from "react";
-import AddToCartBtn from "../../AddToCartBtn/AddToCartBtn";
-import './Product.css';
+import AddToCartBtn from "./AddToCartBtn";
+import '../../App.css';
 import axios from "axios";
-
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 class Product extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: ''
+            id: null
         }
     }
 
     handleAddToCartBtn = (e) => {
         e.preventDefault();
         const id = e.target.getAttribute('id');
-        this.setState({id: id});
-        axios.post(`http://127.0.0.1:8000/cart/${this.state.id}`, this.state.id)
-            .then(res => {
-                const products = res.data;
-                this.setState({products});
-            })
+        this.setState({id: id}, () => {
+            axios.post(`http://127.0.0.1:8000/cart/${this.state.id}`)
+                .then(res => {
+                    console.log(res.data);
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        });
     }
 
     render() {

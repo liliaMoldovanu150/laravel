@@ -13,7 +13,7 @@ return [
     'products' => 'Products',
     'browse' => 'Browse',
     'save' => 'Save',
-    'product_image' => 'Product Image',
+    'product_image' => 'ProductForm Image',
     'all_added' => 'All products were added to cart',
     'orders' => 'Orders',
     'order_total' => 'Order Total',
