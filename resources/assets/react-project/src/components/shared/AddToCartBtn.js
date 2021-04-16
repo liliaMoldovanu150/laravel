@@ -8,7 +8,7 @@ class AddToCartBtn extends Component {
 
     render() {
         return (
-            <a id={this.props.id} onClick={this.props.clickHandler()}>Add</a>
+            <a id={this.props.id} onClick={this.props.clicked()}>Add</a>
         )
     }
 }

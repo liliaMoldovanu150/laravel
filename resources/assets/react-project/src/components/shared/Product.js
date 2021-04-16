@@ -15,7 +15,7 @@ class Product extends Component {
         e.preventDefault();
         const id = e.target.getAttribute('id');
         this.setState({id: id}, () => {
-            axios.post(`http://127.0.0.1:8000/cart/${this.state.id}`)
+            axios.post(`/cart/${this.state.id}`)
                 .then(res => {
                     console.log(res.data);
                 })
@@ -37,7 +37,7 @@ class Product extends Component {
                     <div>{this.props.description}</div>
                     <div>{this.props.price}</div>
                 </div>
-                <AddToCartBtn id={this.props.id} clickHandler={() => this.handleAddToCartBtn}/>
+                <AddToCartBtn id={this.props.id} clicked={()=>this.handleAddToCartBtn}>Add</AddToCartBtn>
             </div>
         )
     }
